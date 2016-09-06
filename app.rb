@@ -60,7 +60,8 @@ get "/audio_index" do
   content_type :json
   Dir.glob("public/wav/*").map do |path|
     resource_path = path.split("public/wav/")[-1]
-    "#{AudioResourceHost}/#{resource_path}?#{TokenQueryParam}"
+    name = resource_path.split("/")[-1]
+    { name: name, url: "#{AudioResourceHost}/#{resource_path}?#{TokenQueryParam}" }
   end.to_json
 end
 
@@ -76,4 +77,16 @@ get "*" do
   else
     "can't access that file"
   end
+end
+
+delete '/delete_audio' do
+  return "unauthenticated" unless can_authenticate?(params[:media_backend_token])
+  name = params[:name].gsub(/[^0-9A-Za-z.\-]/, '_')
+  matching_file = Dir.glob("public/wav/*").first do |path|
+    path.split("/")[-1].split(".")[0] == name
+  end
+  return "cant find audio with that name" unless matching_file
+  binding.pry
+  `rm #{matching_file}`
+  return "OK"
 end
