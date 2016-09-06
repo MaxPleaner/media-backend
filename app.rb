@@ -36,6 +36,7 @@ end
 
 before '/*' do
   headers 'Access-Control-Allow-Origin' => 'http://li1196-141.members.linode.com'
+  headers 'Accept-Ranges' => 'bytes'
 end
 
 AudioResourceHost = "https://li1196-141.members.linode.com/media-backend"
@@ -73,8 +74,10 @@ get "*" do
     content_type 'audio/wav'
   end
   if Dir.glob("public/**/*").include?("public#{request.path}")
+#    status 206
     File.read(File.join("public", request.path))
   else
+    status 422
     "can't access that file"
   end
 end
