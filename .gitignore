@@ -1,3 +1,4 @@
 backend.db
 .env
 public/wav/*.wav
+tmp/*
